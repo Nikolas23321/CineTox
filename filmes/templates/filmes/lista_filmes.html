@@ -7,6 +7,26 @@
 <body>
     <h1>Catálogo de Filmes</h1>
 
+
+    <form method="get" action="">
+        <label for="id_q">Pesquisar por título:</label>
+        <input
+            id="id_q"
+            type="text"
+            name="q"
+            value="{{ termo_busca }}"
+            placeholder="Digite o título do filme..."
+        >
+        <button type="submit">Buscar</button>
+        {% if termo_busca %}
+            <a href="{% url 'filmes:lista_filmes' %}">Limpar</a>
+        {% endif %}
+    </form>
+
+
+    <br>
+
+
     {% if filmes %}
         <table border="1" cellpadding="8" cellspacing="0">
             <thead>
@@ -29,7 +49,11 @@
             </tbody>
         </table>
     {% else %}
-        <p>Nenhum filme cadastrado até o momento.</p>
+        {% if termo_busca %}
+            <p>Nenhum filme encontrado para "{{ termo_busca }}".</p>
+        {% else %}
+            <p>Nenhum filme cadastrado até o momento.</p>
+        {% endif %}
     {% endif %}
 </body>
 </html>
