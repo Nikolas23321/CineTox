@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from .models import Categoria, Diretor, Filme
 
@@ -7,6 +8,7 @@ def lista_filmes(request):
     termo_busca = request.GET.get("q", "").strip()
     diretor_id = request.GET.get("diretor", "").strip()
     categoria_id = request.GET.get("categoria", "").strip()
+    numero_pagina = request.GET.get("page")
 
     filmes = Filme.objects.select_related("diretor", "categoria").all()
 
@@ -19,11 +21,15 @@ def lista_filmes(request):
     if categoria_id:
         filmes = filmes.filter(categoria_id=categoria_id)
 
+    paginator = Paginator(filmes, 5)
+    page_obj = paginator.get_page(numero_pagina)
+
     diretores = Diretor.objects.all()
     categorias = Categoria.objects.all()
 
     context = {
-        "filmes": filmes,
+        "filmes": page_obj,
+        "page_obj": page_obj,
         "termo_busca": termo_busca,
         "diretores": diretores,
         "categorias": categorias,
