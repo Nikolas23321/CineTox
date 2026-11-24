@@ -7,7 +7,6 @@
 <body>
     <h1>Catálogo de Filmes</h1>
 
-
     <form method="get" action="">
         <label for="id_q">Pesquisar por título:</label>
         <input
@@ -17,15 +16,34 @@
             value="{{ termo_busca }}"
             placeholder="Digite o título do filme..."
         >
-        <button type="submit">Buscar</button>
-        {% if termo_busca %}
-            <a href="{% url 'filmes:lista_filmes' %}">Limpar</a>
+
+        <label for="id_diretor">Diretor:</label>
+        <select id="id_diretor" name="diretor">
+            <option value="">Todos os diretores</option>
+            {% for diretor in diretores %}
+                <option value="{{ diretor.id }}" {% if diretor.id|stringformat:"s" == diretor_selecionado %}selected{% endif %}>
+                    {{ diretor.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="id_categoria">Categoria:</label>
+        <select id="id_categoria" name="categoria">
+            <option value="">Todas as categorias</option>
+            {% for categoria in categorias %}
+                <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_selecionada %}selected{% endif %}>
+                    {{ categoria.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filtrar</button>
+        {% if termo_busca or diretor_selecionado or categoria_selecionada %}
+            <a href="{% url 'filmes:lista_filmes' %}">Limpar filtros</a>
         {% endif %}
     </form>
 
-
     <br>
-
 
     {% if filmes %}
         <table border="1" cellpadding="8" cellspacing="0">
@@ -49,8 +67,8 @@
             </tbody>
         </table>
     {% else %}
-        {% if termo_busca %}
-            <p>Nenhum filme encontrado para "{{ termo_busca }}".</p>
+        {% if termo_busca or diretor_selecionado or categoria_selecionada %}
+            <p>Nenhum filme encontrado com os filtros selecionados.</p>
         {% else %}
             <p>Nenhum filme cadastrado até o momento.</p>
         {% endif %}
