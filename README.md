@@ -28,7 +28,7 @@ Catálogo de Filmes, gerenciado pelo app filmes com os modelos Filme, Diretor e 
 ## Como executar localmente
 
 ```bash
-git clone <url-do-repositorio>
+git clone <https://github.com/Nikolas23321/CineTox.git>
 cd cinetox
 python -m venv .venv
 source .venv/bin/activate
