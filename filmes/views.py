@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from .models import Categoria, Diretor, Filme
@@ -24,6 +25,16 @@ def lista_filmes(request):
     paginator = Paginator(filmes, 5)
     page_obj = paginator.get_page(numero_pagina)
 
+    filtros_ativos = {}
+    if termo_busca:
+        filtros_ativos["q"] = termo_busca
+    if diretor_id:
+        filtros_ativos["diretor"] = diretor_id
+    if categoria_id:
+        filtros_ativos["categoria"] = categoria_id
+
+    querystring = urlencode(filtros_ativos)
+
     diretores = Diretor.objects.all()
     categorias = Categoria.objects.all()
 
@@ -35,5 +46,6 @@ def lista_filmes(request):
         "categorias": categorias,
         "diretor_selecionado": diretor_id,
         "categoria_selecionada": categoria_id,
+        "querystring": querystring,
     }
     return render(request, "filmes/lista_filmes.html", context)
