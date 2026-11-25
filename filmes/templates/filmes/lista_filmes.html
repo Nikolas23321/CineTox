@@ -1,91 +1,163 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cinetox — Catálogo de Filmes</title>
+    <link rel="stylesheet" href="{% static 'filmes/style.css' %}">
 </head>
 <body>
-    <h1>Catálogo de Filmes</h1>
 
-    <form method="get" action="">
-        <label for="id_q">Pesquisar por título:</label>
-        <input
-            id="id_q"
-            type="text"
-            name="q"
-            value="{{ termo_busca }}"
-            placeholder="Digite o título do filme..."
-        >
+    <aside class="sidebar">
+        <a href="{% url 'filmes:lista_filmes' %}" class="sidebar-icon active" title="Catálogo">🎬</a>
+        <a href="{% url 'filmes:lista_filmes' %}" class="sidebar-icon" title="Filmes">🎞️</a>
+        <a href="/admin/" class="sidebar-icon" title="Admin Django">⚙️</a>
+    </aside>
 
-        <label for="id_diretor">Diretor:</label>
-        <select id="id_diretor" name="diretor">
-            <option value="">Todos os diretores</option>
-            {% for diretor in diretores %}
-                <option value="{{ diretor.id }}" {% if diretor.id|stringformat:"s" == diretor_selecionado %}selected{% endif %}>
-                    {{ diretor.nome }}
-                </option>
-            {% endfor %}
-        </select>
+    <div class="main-wrapper">
+        <header class="topbar">
+            <nav class="nav-links">
+                <a href="{% url 'filmes:lista_filmes' %}" class="active">Filmes</a>
+                <a href="{% url 'filmes:lista_filmes' %}">Diretores</a>
+                <a href="{% url 'filmes:lista_filmes' %}">Categorias</a>
+            </nav>
 
-        <label for="id_categoria">Categoria:</label>
-        <select id="id_categoria" name="categoria">
-            <option value="">Todas as categorias</option>
-            {% for categoria in categorias %}
-                <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_selecionada %}selected{% endif %}>
-                    {{ categoria.nome }}
-                </option>
-            {% endfor %}
-        </select>
+            <a href="{% url 'filmes:lista_filmes' %}" class="brand-logo">cine<span>tox</span></a>
 
-        <button type="submit">Filtrar</button>
-        {% if termo_busca or diretor_selecionado or categoria_selecionada %}
-            <a href="{% url 'filmes:lista_filmes' %}">Limpar filtros</a>
-        {% endif %}
-    </form>
+            <div class="user-area">
+                <span>Catálogo</span>
+                <div class="user-avatar">CT</div>
+            </div>
+        </header>
 
-    <br>
+        <section class="hero-banner">
+            <div class="hero-content">
+                <span class="hero-tag">Catálogo em Destaque</span>
+                {% if filmes %}
+                    <h1 class="hero-title">{{ filmes.0.titulo }}</h1>
+                    <div class="hero-meta">
+                        <span class="rating-stars">★ Destaque</span>
+                        <span>{{ filmes.0.categoria.nome|default:"Sem categoria" }} • {{ filmes.0.ano_lancamento|default:"-" }}</span>
+                    </div>
+                    <p class="hero-desc">
+                        Dirigido por {{ filmes.0.diretor.nome }}. Explore o catálogo completo abaixo, pesquise por título ou filtre por diretor e categoria.
+                    </p>
+                {% else %}
+                    <h1 class="hero-title">Cinetox</h1>
+                    <p class="hero-desc">
+                        Explore nossa coleção de filmes, pesquise por título e combine filtros por diretor e categoria.
+                    </p>
+                {% endif %}
+                <div class="hero-actions">
+                    <a href="#catalogo" class="btn-primary">Explorar Catálogo</a>
+                    <a href="/admin/" class="btn-circle" title="Cadastrar no Admin">+</a>
+                </div>
+            </div>
+        </section>
 
-    {% if filmes %}
-        <table border="1" cellpadding="8" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Diretor</th>
-                    <th>Categoria</th>
-                    <th>Ano de Lançamento</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for filme in filmes %}
-                    <tr>
-                        <td>{{ filme.titulo }}</td>
-                        <td>{{ filme.diretor.nome }}</td>
-                        <td>{{ filme.categoria.nome|default:"Sem categoria" }}</td>
-                        <td>{{ filme.ano_lancamento|default:"-" }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <section id="catalogo">
+            <div class="section-header">
+                <h2 class="section-title">Catálogo de Filmes</h2>
+            </div>
 
-        <br>
+            <form method="get" action="" class="filter-bar">
+                <select id="id_diretor" name="diretor" class="filter-select">
+                    <option value="">Diretor</option>
+                    {% for diretor in diretores %}
+                        <option value="{{ diretor.id }}" {% if diretor.id|stringformat:"s" == diretor_selecionado %}selected{% endif %}>
+                            {{ diretor.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-        <div>
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a>
+                <select id="id_categoria" name="categoria" class="filter-select">
+                    <option value="">Categoria</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == categoria_selecionada %}selected{% endif %}>
+                            {{ categoria.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input
+                    id="id_q"
+                    type="text"
+                    name="q"
+                    value="{{ termo_busca }}"
+                    placeholder="Pesquisar título..."
+                    class="filter-input"
+                >
+
+                <button type="submit" class="btn-filter">Filtrar</button>
+
+                {% if termo_busca or diretor_selecionado or categoria_selecionada %}
+                    <a href="{% url 'filmes:lista_filmes' %}" class="btn-clear">Limpar</a>
+                {% endif %}
+            </form>
+
+            {% if filmes %}
+                <div class="movies-grid">
+                    {% for filme in filmes %}
+                        <article class="movie-card">
+                            <div class="card-top">
+                                <span class="badge-categoria">{{ filme.categoria.nome|default:"Geral" }}</span>
+                                <span class="card-add">+</span>
+                            </div>
+
+                            <div class="card-poster-placeholder">
+                                {{ filme.titulo|slice:":1" }}
+                            </div>
+
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="star">★</span>
+                                    <span class="year-pill">{{ filme.ano_lancamento|default:"-" }}</span>
+                                </div>
+                                <h3 class="card-title">{{ filme.titulo }}</h3>
+                                <p class="card-director">{{ filme.diretor.nome }}</p>
+                                <span class="card-btn">Ver detalhes</span>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <div class="pagination-wrapper">
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&lt;</a>
+                        {% else %}
+                            <span class="page-link disabled">&lt;</span>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% else %}
+                                <a class="page-link" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&gt;</a>
+                        {% else %}
+                            <span class="page-link disabled">&gt;</span>
+                        {% endif %}
+                    </div>
+
+                    <span class="page-info">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    {% if termo_busca or diretor_selecionado or categoria_selecionada %}
+                        <p>Nenhum filme encontrado com os filtros selecionados.</p>
+                    {% else %}
+                        <p>Nenhum filme cadastrado até o momento.</p>
+                    {% endif %}
+                </div>
             {% endif %}
+        </section>
+    </div>
 
-            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Próxima</a>
-            {% endif %}
-        </div>
-    {% else %}
-        {% if termo_busca or diretor_selecionado or categoria_selecionada %}
-            <p>Nenhum filme encontrado com os filtros selecionados.</p>
-        {% else %}
-            <p>Nenhum filme cadastrado até o momento.</p>
-        {% endif %}
-    {% endif %}
 </body>
 </html>
