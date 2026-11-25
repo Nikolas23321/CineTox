@@ -71,13 +71,13 @@
 
         <div>
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a>
             {% endif %}
 
             <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Próxima</a>
             {% endif %}
         </div>
     {% else %}
